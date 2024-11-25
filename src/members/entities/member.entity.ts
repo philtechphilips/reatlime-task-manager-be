@@ -1,6 +1,6 @@
 import { User } from 'src/auth/entities/auth.entity';
 import { Organization } from 'src/organizations/entities/organization.entity';
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'members' })
 export class Member {
@@ -20,4 +20,10 @@ export class Member {
   })
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }
