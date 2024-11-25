@@ -6,16 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
 
-@Controller('members')
+@Controller('/v1/members')
 export class MembersController {
   constructor(private readonly membersService: MembersService) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   create(@Body() createMemberDto: CreateMemberDto) {
     return this.membersService.create(createMemberDto);
   }
@@ -27,7 +30,7 @@ export class MembersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.membersService.findOne(+id);
+    return this.membersService.findOne(id);
   }
 
   @Patch(':id')
@@ -37,6 +40,6 @@ export class MembersController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.membersService.remove(+id);
+    return this.membersService.remove(id);
   }
 }

@@ -1,4 +1,9 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { OrganizationRepo } from './repository/organization.repository';
@@ -45,8 +50,8 @@ export class OrganizationsService {
       const queryBuilder =
         await this.orgRepo.createQueryBuilder('organizations');
       queryBuilder
-        .leftJoinAndSelect('organizations.user', 'user')
-        .addSelect(['user.id', 'user.name', 'user.email']);
+        .leftJoin('organizations.user', 'user')
+        .addSelect(['user.id', 'user.fullName', 'user.email']);
 
       const organizations = queryBuilder.getMany();
       return organizations;
@@ -62,16 +67,19 @@ export class OrganizationsService {
 
       const organization = await queryBuilder
         .where('organizations.id = :id', { id })
-        .leftJoinAndSelect('organizations.user', 'user')
-        .addSelect(['user.id', 'user.name', 'user.email'])
+        .leftJoin('organizations.user', 'user')
+        .addSelect(['user.id', 'user.fullName', 'user.email'])
         .getOne();
 
       if (!organization) {
-        throw new HttpException('Organization not found!', 404);
+        throw new NotFoundException('Organization not found!');
       }
 
       return organization;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new HttpException('An error occured!', 500);
     }
   }
