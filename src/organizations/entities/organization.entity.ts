@@ -6,6 +6,8 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -18,11 +20,13 @@ export class Organization {
   @Column()
   name: string;
 
-  @ManyToMany(() => Member)
-  @JoinTable()
+  @OneToMany(() => Member, (member) => member.organization)
   members: Member[];
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  profile: User;
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column()
+  userId: string;
 }

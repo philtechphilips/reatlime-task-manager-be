@@ -6,18 +6,24 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  Req,
+  Request,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 
-@Controller('organizations')
+@Controller('/v1/organizations')
 export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
   @Post()
-  create(@Body() createOrganizationDto: CreateOrganizationDto) {
-    return this.organizationsService.create(createOrganizationDto);
+  @UsePipes(ValidationPipe)
+  create(@Body() createOrganizationDto: CreateOrganizationDto, @Request() req) {
+    return this.organizationsService.create(createOrganizationDto, req.user);
   }
 
   @Get()
