@@ -1,6 +1,14 @@
-import { User } from "src/auth/entities/auth.entity";
-import { Task } from "src/tasks/entities/task.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { User } from 'src/auth/entities/auth.entity';
+import { Task } from 'src/tasks/entities/task.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'comments' })
 export class Comment {
