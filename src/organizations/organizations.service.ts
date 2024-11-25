@@ -42,27 +42,29 @@ export class OrganizationsService {
 
   async findAll() {
     try {
-      const queryBuilder = await this.orgRepo.createQueryBuilder('organizations');
+      const queryBuilder =
+        await this.orgRepo.createQueryBuilder('organizations');
       queryBuilder
-      .leftJoinAndSelect('organizations.user', 'user')
-      .addSelect(['user.id', 'user.name', 'user.email']);
+        .leftJoinAndSelect('organizations.user', 'user')
+        .addSelect(['user.id', 'user.name', 'user.email']);
 
       const organizations = queryBuilder.getMany();
       return organizations;
     } catch (error) {
-      throw new HttpException("An error occured!", 500);
+      throw new HttpException('An error occured!', 500);
     }
   }
 
   async findOne(id: string) {
     try {
-      const queryBuilder = await this.orgRepo.createQueryBuilder('organizations');
-      
+      const queryBuilder =
+        await this.orgRepo.createQueryBuilder('organizations');
+
       const organization = await queryBuilder
-      .where('organizations.id = :id', { id })
-      .leftJoinAndSelect('organizations.user', 'user')
-      .addSelect(['user.id', 'user.name', 'user.email'])
-      .getOne();
+        .where('organizations.id = :id', { id })
+        .leftJoinAndSelect('organizations.user', 'user')
+        .addSelect(['user.id', 'user.name', 'user.email'])
+        .getOne();
 
       if (!organization) {
         throw new HttpException('Organization not found!', 404);
@@ -70,7 +72,7 @@ export class OrganizationsService {
 
       return organization;
     } catch (error) {
-      throw new HttpException("An error occured!", 500);
+      throw new HttpException('An error occured!', 500);
     }
   }
 
@@ -81,17 +83,17 @@ export class OrganizationsService {
   async remove(id: string) {
     try {
       const organization = await this.orgRepo.findOne({ id });
-  
+
       if (!organization) {
         throw new HttpException('Organization not found!', 404);
       }
-  
+
       await this.orgRepo.delete(organization.id);
-  
+
       return { message: 'Organization successfully deleted!' };
     } catch (error) {
       console.error('Error removing organization:', error);
       throw new HttpException('An error occurred!', 500);
     }
-  }  
+  }
 }
