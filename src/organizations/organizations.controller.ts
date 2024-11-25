@@ -33,7 +33,7 @@ export class OrganizationsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.organizationsService.findOne(+id);
+    return this.organizationsService.findOne(id);
   }
 
   @Patch(':id')
@@ -46,6 +46,6 @@ export class OrganizationsController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.organizationsService.remove(+id);
+    return this.organizationsService.remove(id);
   }
 }

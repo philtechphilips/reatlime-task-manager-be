@@ -19,4 +19,8 @@ export class OrganizationRepo extends BaseRepository<Organization> {
   async save(data: Organization) {
     return await this.organizationRepo.save(data);
   }
+
+  async delete(id: string) {
+    await this.organizationRepo.delete(id);
+  }
 }

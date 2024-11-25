@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { OrganizationRepo } from './repository/organization.repository';
@@ -40,19 +40,58 @@ export class OrganizationsService {
     }
   }
 
-  findAll() {
-    return `This action returns all organizations`;
+  async findAll() {
+    try {
+      const queryBuilder = await this.orgRepo.createQueryBuilder('organizations');
+      queryBuilder
+      .leftJoinAndSelect('organizations.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email']);
+
+      const organizations = queryBuilder.getMany();
+      return organizations;
+    } catch (error) {
+      throw new HttpException("An error occured!", 500);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} organization`;
+  async findOne(id: string) {
+    try {
+      const queryBuilder = await this.orgRepo.createQueryBuilder('organizations');
+      
+      const organization = await queryBuilder
+      .where('organizations.id = :id', { id })
+      .leftJoinAndSelect('organizations.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.email'])
+      .getOne();
+
+      if (!organization) {
+        throw new HttpException('Organization not found!', 404);
+      }
+
+      return organization;
+    } catch (error) {
+      throw new HttpException("An error occured!", 500);
+    }
   }
 
   update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
     return `This action updates a #${id} organization`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} organization`;
-  }
+  async remove(id: string) {
+    try {
+      const organization = await this.orgRepo.findOne({ id });
+  
+      if (!organization) {
+        throw new HttpException('Organization not found!', 404);
+      }
+  
+      await this.orgRepo.delete(organization.id);
+  
+      return { message: 'Organization successfully deleted!' };
+    } catch (error) {
+      console.error('Error removing organization:', error);
+      throw new HttpException('An error occurred!', 500);
+    }
+  }  
 }
