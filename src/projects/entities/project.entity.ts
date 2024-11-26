@@ -19,6 +19,9 @@ export class Project {
   @Column()
   name: string;
 
+  @Column()
+  description: string;
+
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'userId' })
   user: User;

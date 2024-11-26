@@ -11,6 +11,14 @@ export class CreateProjectDto {
   name: string;
 
   @ApiProperty({
+    example: 'This is product description',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 255)
+  description: string;
+
+  @ApiProperty({
     example: '22a9f442-75d0-4b4e-9ffe-f9afcd449607',
   })
   @IsString()

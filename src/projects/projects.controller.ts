@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Request,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -17,6 +19,7 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   create(@Body() createProjectDto: CreateProjectDto, @Request() req) {
     return this.projectsService.create(createProjectDto, req?.user?.id);
   }

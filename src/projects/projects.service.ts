@@ -46,7 +46,16 @@ export class ProjectsService {
 
   async findAll() {
     try {
-    } catch (error) {}
+      const queryBuilder = await this.projectRepo.createQueryBuilder('projects');
+    queryBuilder
+    .leftJoinAndSelect('projects.organization', 'organization')
+      .leftJoin('projects.user', 'user')
+      .addSelect(['user.id', 'user.fullName', 'user.email']);
+
+      return queryBuilder.getMany();
+    } catch (error) {
+      throw new HttpException("An error occured!", 500);
+    }
   }
 
   findOne(id: number) {
