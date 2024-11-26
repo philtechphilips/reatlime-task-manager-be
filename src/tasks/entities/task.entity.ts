@@ -24,7 +24,7 @@ export class Task {
   @Column()
   details: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   dueDate: Date;
 
   @Column()
