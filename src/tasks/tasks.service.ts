@@ -1,4 +1,9 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskRepo } from './repository/tasks.repository';
@@ -62,13 +67,34 @@ export class TasksService {
 
       return queryBuilder.getMany();
     } catch (error) {
-      console.log(error);
       throw new HttpException('An error occured!', 500);
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(id: string) {
+    try {
+      const queryBuilder = await this.taskRepo.createQueryBuilder('tasks');
+      queryBuilder
+        .where('tasks.id = :id', { id })
+        .leftJoinAndSelect('tasks.organization', 'organization')
+        .leftJoin('tasks.user', 'user')
+        .addSelect(['user.id', 'user.fullName', 'user.email'])
+        .leftJoinAndSelect('tasks.project', 'project')
+        .leftJoin('tasks.assignee', 'assignee')
+        .addSelect(['assignee.id', 'assignee.fullName', 'assignee.email']);
+
+      const task = queryBuilder.getOne();
+
+      if (!task) {
+        throw new NotFoundException('Project not found!');
+      }
+      return task;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new HttpException('An error occured!', 500);
+    }
   }
 
   update(id: number, updateTaskDto: UpdateTaskDto) {
