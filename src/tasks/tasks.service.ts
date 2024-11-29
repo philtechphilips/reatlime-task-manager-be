@@ -49,11 +49,21 @@ export class TasksService {
     }
   }
 
-  findAll() {
+  async findAll() {
     try {
-      
+      const queryBuilder = await this.taskRepo.createQueryBuilder('tasks');
+      queryBuilder
+        .leftJoinAndSelect('tasks.organization', 'organization')
+        .leftJoin('tasks.user', 'user')
+        .addSelect(['user.id', 'user.fullName', 'user.email'])
+        .leftJoinAndSelect('tasks.project', 'project')
+        .leftJoin('tasks.assignee', 'assignee')
+        .addSelect(['assignee.id', 'assignee.fullName', 'assignee.email']);
+
+      return queryBuilder.getMany();
     } catch (error) {
-      
+      console.log(error);
+      throw new HttpException('An error occured!', 500);
     }
   }
 

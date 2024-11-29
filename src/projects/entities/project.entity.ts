@@ -1,5 +1,6 @@
 import { User } from 'src/auth/entities/auth.entity';
 import { Organization } from 'src/organizations/entities/organization.entity';
+import { Task } from 'src/tasks/entities/task.entity';
 import {
   Column,
   CreateDateColumn,
@@ -29,6 +30,9 @@ export class Project {
   @ManyToOne(() => Organization, (organization) => organization.id)
   @JoinColumn({ name: 'organizationId' })
   organization: Organization;
+
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
