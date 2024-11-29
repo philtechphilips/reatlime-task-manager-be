@@ -65,7 +65,7 @@ export class TasksService {
         .leftJoin('tasks.assignee', 'assignee')
         .addSelect(['assignee.id', 'assignee.fullName', 'assignee.email']);
 
-      return queryBuilder.getMany();
+      return await queryBuilder.getMany();
     } catch (error) {
       throw new HttpException('An error occured!', 500);
     }
@@ -83,10 +83,10 @@ export class TasksService {
         .leftJoin('tasks.assignee', 'assignee')
         .addSelect(['assignee.id', 'assignee.fullName', 'assignee.email']);
 
-      const task = queryBuilder.getOne();
+      const task = await queryBuilder.getOne();
 
       if (!task) {
-        throw new NotFoundException('Project not found!');
+        throw new NotFoundException('Task not found!');
       }
       return task;
     } catch (error) {
@@ -101,7 +101,24 @@ export class TasksService {
     return `This action updates a #${id} task`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(id: string) {
+    try {
+      const queryBuilder = await this.taskRepo.createQueryBuilder('tasks');
+      queryBuilder.where('tasks.id = :id', { id });
+
+      const task = await queryBuilder.getOne();
+      console.log(task);
+      if (!task) {
+        throw new NotFoundException('Task not found!');
+      }
+
+      await this.taskRepo.delete(id);
+      return { message: 'Task deleted sucessfully!' };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new HttpException('An error occured!', 500);
+    }
   }
 }
