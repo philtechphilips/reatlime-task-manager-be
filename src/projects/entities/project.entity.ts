@@ -1,32 +1,38 @@
 import { User } from 'src/auth/entities/auth.entity';
 import { Organization } from 'src/organizations/entities/organization.entity';
+import { Task } from 'src/tasks/entities/task.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'members' })
-export class Member {
+@Entity({ name: 'projects' })
+export class Project {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Organization, (organization) => organization.members, {
-    onDelete: 'CASCADE',
-    nullable: false,
-  })
+  @Column()
+  name: string;
+
+  @Column()
+  description: string;
+
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ManyToOne(() => Organization, (organization) => organization.id)
   @JoinColumn({ name: 'organizationId' })
   organization: Organization;
 
-  @ManyToOne(() => User, (user) => user.id, {
-    onDelete: 'CASCADE',
-    nullable: false,
-  })
-  @JoinColumn({ name: 'userId' })
-  user: User;
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { datasourceOptions } from './config/typeorm.config';
-import { AuthModule } from './auth/auth.module';
-import { JwtStrategy } from './auth/strategies/jwt.strategy';
-import { JwtAuthGuard } from './auth/guards/jwt.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { datasourceOptions } from './config/typeorm.config';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwt.guard';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { MembersModule } from './members/members.module';
+import { ProjectsModule } from './projects/projects.module';
+import { TasksModule } from './tasks/tasks.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -18,6 +20,9 @@ import { MembersModule } from './members/members.module';
     AuthModule,
     OrganizationsModule,
     MembersModule,
+    ProjectsModule,
+    TasksModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [

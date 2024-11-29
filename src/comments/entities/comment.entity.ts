@@ -1,36 +1,30 @@
 import { User } from 'src/auth/entities/auth.entity';
-import { Member } from 'src/members/entities/member.entity';
+import { Task } from 'src/tasks/entities/task.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
-  OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'organizations' })
-export class Organization {
+@Entity({ name: 'comments' })
+export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  name: string;
-
-  @OneToMany(() => Member, (member) => member.organization)
-  members: Member[];
+  content: string;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
-  userId: string;
+  @ManyToOne(() => Task, (task) => task.comments)
+  @JoinColumn({ name: 'taskId' })
+  task: Task;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
