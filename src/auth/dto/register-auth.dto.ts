@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -20,6 +20,14 @@ export class RegisterAuthDto {
   @IsNotEmpty()
   @Length(1, 255)
   fullName: string;
+
+  @ApiProperty({
+    example: 'Xttreme Developers',
+    description: 'The company name of the user',
+  })
+  @IsString()
+  @IsOptional()
+  company: string;
 
   @ApiProperty({
     example: 'email',

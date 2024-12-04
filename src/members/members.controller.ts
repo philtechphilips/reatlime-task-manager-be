@@ -33,6 +33,11 @@ export class MembersController {
     return this.membersService.findOne(id);
   }
 
+  @Get('/user/:id')
+  getMemberByUserId(@Param('id') id: string) {
+    return this.membersService.getMemberByUserId(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberDto) {
     return this.membersService.update(+id, updateMemberDto);
