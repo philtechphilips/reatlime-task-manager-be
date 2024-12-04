@@ -13,6 +13,8 @@ import { Repository } from 'typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/role.guard';
 import { EmailService } from 'src/shared/email/email.service';
+import { Organization } from 'src/organizations/entities/organization.entity';
+import { OrganizationRepo } from 'src/organizations/repository/organization.repository';
 
 @Module({
   imports: [
@@ -27,11 +29,13 @@ import { EmailService } from 'src/shared/email/email.service';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Organization]),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     AuthRepo,
+    OrganizationRepo,
     LocalStrategy,
     Repository,
     JwtStrategy,
@@ -41,6 +45,6 @@ import { EmailService } from 'src/shared/email/email.service';
       useClass: RolesGuard,
     },
   ],
-  exports: [AuthRepo, AuthService, Repository],
+  exports: [AuthRepo, AuthService, OrganizationRepo, Repository],
 })
 export class AuthModule {}

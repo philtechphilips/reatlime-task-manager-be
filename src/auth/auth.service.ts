@@ -8,6 +8,7 @@ import { AuthRepo } from './repository/auth.repository';
 import { EmailService } from 'src/shared/email/email.service';
 import * as dotenv from 'dotenv';
 import { config } from 'src/shared/config/config.service';
+import { OrganizationRepo } from 'src/organizations/repository/organization.repository';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: EmailService,
     private readonly authRepo: AuthRepo,
+    private readonly orgRepo: OrganizationRepo,
   ) {}
 
   async validateUser({ email, password }: CreateAuthDto) {
@@ -28,9 +30,15 @@ export class AuthService {
         password,
         findUser.password,
       );
+      const queryBuilder = await this.authRepo.createQueryBuilder('user');
+
+      const userWithOrg = await queryBuilder
+        .where('user.id = :id', { id: findUser.id })
+        .leftJoinAndSelect('user.organizations', 'organization')
+        .getOne();
 
       if (decryptPassword) {
-        const { password, ...user } = findUser;
+        const { password, ...user } = userWithOrg ? userWithOrg : findUser;
         const token = this.jwtService.sign(user);
         return { ...user, token };
       }
@@ -40,6 +48,7 @@ export class AuthService {
   }
 
   async create(registerDto: RegisterAuthDto) {
+    let userData;
     try {
       const existingUser = await this.authRepo.findOne({
         email: registerDto.email,
@@ -54,13 +63,25 @@ export class AuthService {
       const password = await hashPassword(registerDto.password);
       registerDto.password = password;
 
-      const createdUser = await this.authRepo.create(registerDto);
+      userData = await this.authRepo.create(registerDto);
 
-      // Destructure password out, leaving other properties in `user`
-      const { password: _, ...user } = createdUser;
+      if (registerDto.company) {
+        await this.orgRepo.create({
+          name: registerDto.company,
+          userId: userData.id,
+        });
+
+        const queryBuilder = await this.authRepo.createQueryBuilder('user');
+
+        userData = await queryBuilder
+          .where('user.id = :id', { id: userData.id })
+          .leftJoinAndSelect('user.organizations', 'organization')
+          .getOne();
+      }
+
+      const { password: _, ...user } = userData;
 
       const token = this.jwtService.sign(user);
-
       return { ...user, token };
     } catch (error) {
       throw error;

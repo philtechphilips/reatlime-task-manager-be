@@ -74,6 +74,30 @@ export class MembersService {
     }
   }
 
+  async getMemberByUserId(id: string) {
+    try {
+      const queryBuilder = await this.membersRepo.createQueryBuilder('members');
+
+      const member = await queryBuilder
+        .leftJoinAndSelect('members.organization', 'organization')
+        .leftJoin('members.user', 'user')
+        .addSelect(['user.id', 'user.fullName', 'user.email'])
+        .where('members.userId = :id', { id })
+        .getOne();
+
+      if (!member) {
+        throw new NotFoundException('Member not found!');
+      }
+
+      return member;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new HttpException('An error occured!', 500);
+    }
+  }
+
   update(id: number, updateMemberDto: UpdateMemberDto) {
     return `This action updates a #${id} member`;
   }
