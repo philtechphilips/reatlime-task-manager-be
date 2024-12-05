@@ -16,12 +16,12 @@ export class MembersService {
   async create(createMemberDto: CreateMemberDto) {
     try {
       const [user, organization] = await Promise.all([
-        this.userRepo.findOne({ id: createMemberDto.userId }),
+        this.userRepo.findOne({ email: createMemberDto.email }),
         this.organizationRepo.findOne({ id: createMemberDto.organizationId }),
       ]);
 
       if (!user || !organization) {
-        throw new Error('User or Organization not found');
+       throw new NotFoundException('User or Organization not found');
       }
 
       const member = this.membersRepo.create({
@@ -31,6 +31,9 @@ export class MembersService {
 
       return { message: 'Member created sucessfully!' };
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to create member: ${error.message}`);
     }
   }
